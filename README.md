@@ -10,11 +10,11 @@ Beam can be embedded with very little overhead by using Go channels. It
 also implements an efficient http2/tls transport which can be used to
 securely expose and consume any micro-service across a distributed system.
 
-Because remote Beam sessions are regular HTTP2 over TLS sessions, they can
-be used in combination with any standard proxy or authentication
+Because remote Beam sessions use regular HTTP/2.0 over TLS sessions, they can
+be used in combination with standard HTTP/2.0 proxy or authentication
 middleware. This means Beam, when configured propely, can be safely exposed
 on the public Internet. It can also be embedded in an existing rest API
-using an http1 and websocket fallback.
+using an HTTP/1.0 and websocket fallback.
 
 ## How is it different from RPC or REST?
 
@@ -32,35 +32,35 @@ of tools.
 Instead of a clunky patchwork of tools, Beam implements in a single
 minimalistic library all the primitives needed by modern micro-services:
 
-* Request/response with arbitrary structured data
+* Request/Response Message Pattern
+    * Allows arbitrary structured data
+    * Requests and responses can flow in any direction, and can be arbitrarily nested, for example to implement a self-registering worker model
+    * Any request or response can include any number of streams, multiplexed in both directions on the same session
 
-* Asynchronous events flowing in real-time in both directions
+* Asynchronous Event Message Pattern
+    * Events may flow in real-time in both directions
 
-* Requests and responses can flow in any direction, and can be arbitrarily
-nested, for example to implement a self-registering worker model
+* Pluggable Message Serialization Interface
+    * Any message serialization format can be plugged in: 
+        * JSON
+        * XML
+        * MessagePack
+        * Protobuf
+        * Optional minimalist key/value format, designed to be:
+            * Extremely fast to serialize and parse
+            * Dead-simple to implement
+            * Suitable for one-time data copy, file storage, and real-time synchronization
 
-* Any request or response can include any number of streams, multiplexed in
-both directions on the same session.
+* File Descriptor Support
+    * Raw file descriptors can be "attached" to any message, and passed under the hood using the best method available to each transport:
+        * Go channel transport just passes os.File pointers around
+        * Unix socket transport uses fd passing which makes it suitable for high-performance IPC
+        * TCP transport uses dedicated HTTP/2.0 streams
+        * (Bonus Extension): A built-in TCP gateway
+            * Can be used to proxy raw network sockets without extra overhead. 
+            * That means Beam services can be used as smart gateways to an sql database, ssh or file transfer service, with unified auth, discovery and tooling and without performance penalty.
 
-* Any message serialization format can be plugged in: json, msgpack, xml,
-protobuf.
-
-* As an optional convenience a minimalist key-value format is implemented.
-It is designed to be extremely fast to serialize and parse, dead-simple to
-implement, and suitable for both one-time data copy, file storage, and
-real-time synchronization.
-
-* Raw file descriptors can be "attached" to any message, and passed under
-the hood using the best method available to each transport. The Go channel
-transport just passes os.File pointers around. The unix socket transport
-uses fd passing which makes it suitable for high-performance IPC. The
-tcp transport uses dedicated http2 streams. And as a bonus extension, a
-built-in  tcp gateway can be used to proxy raw network sockets without
-extra overhead. That means Beam services can be used as smart gateways to a
-sql database, ssh or file transfer service, with unified auth, discovery
-and tooling and without performance penalty.
-
-## Design philosophy
+## Design Philosophy
 
 An explicit goal of Beam is simplicity of implementation and clarity of
 spec. Porting it to any language should be as effortless as humanly
@@ -73,7 +73,7 @@ possible.
 - <http://twitter.com/solomonstre>
 - <http://github.com/shykes>
 
-## Copyright and license
+## Copyright and License
 
-Code and documentation copyright 2013-2014 Docker, inc. Code released under the Apache 2.0 license.
-Docs released under Creative commons.
+Code and documentation Copyright 2013-2014 Docker, Inc. Code released under the Apache 2.0 license.
+Docs released under Creative Commons.
