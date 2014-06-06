@@ -75,5 +75,6 @@ possible.
 
 ## Copyright and License
 
-Code and documentation Copyright 2013-2014 Docker, Inc. Code released under the Apache 2.0 license.
+Code and documentation Copyright 2013-2014 Docker, Inc. 
+Code released under the Apache 2.0 license.
 Docs released under Creative Commons.
